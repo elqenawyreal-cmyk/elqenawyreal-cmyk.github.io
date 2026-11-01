@@ -513,15 +513,24 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
     });
     return units;
   }
-  fetch('https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&headers=1&t=' + Date.now())
-    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
-    .then(t => {
-      const units = rowsToUnits(parseCSV(t));
-      if (!units.length) return;
-      D.units = units; renderCats();
-      if (cur){ renderRanges(); renderGrid(); }
-    })
-    .catch(() => { /* keep the built-in list */ });
+  // main tab + the Google Form responses tab; merged and de-duplicated
+  const TABS = ['1156483525', '418683083'];   // tab ids: the main list, then the form responses
+  Promise.all(TABS.map(gid =>
+    fetch('https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&headers=1&gid=' + gid + '&t=' + Date.now())
+      .then(r => r.ok ? r.text() : '')
+      .then(t => t ? rowsToUnits(parseCSV(t)) : [])
+      .catch(() => [])
+  )).then(lists => {
+    const seen = new Set(), units = [];
+    lists.flat().forEach((u, i) => {
+      const key = u.code + '|' + u.price + '|' + u.title;
+      if (seen.has(key)) return;
+      seen.add(key); u.id = 'u' + i; units.push(u);
+    });
+    if (!units.length) return;
+    D.units = units; renderCats();
+    if (cur){ renderRanges(); renderGrid(); }
+  });
 
   // intro: welcome → about → how → site
   const steps = ['s-welcome', 's-about', 's-how'];
