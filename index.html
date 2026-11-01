@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>شركة القناوي للتسويق العقاري</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one dark office-wall world lit in gold; a guided path welcome → about → pick type → pick price → watch the flat */
+:root{
+  --bg:#141210;          /* charcoal wall */
+  --panel:#1e1b18;       /* raised panel */
+  --line:#3a332b;        /* hairline */
+  --gold:#d9b25f;        /* logo gold */
+  --gold-2:#f3d998;      /* gold highlight */
+  --text:#f2ece2;        /* warm white */
+  --muted:#a89d8c;       /* secondary text */
+  --display:"Lalezar","Cairo",system-ui,sans-serif;
+  --body:"Cairo",system-ui,"Segoe UI",Tahoma,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7}
+img,video{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold-2);outline-offset:3px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.gold-text{background:linear-gradient(180deg,var(--gold-2),var(--gold) 60%,#a77f33);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+
+/* buttons */
+.btn{border:0;border-radius:999px;padding:12px 30px 14px;font-weight:900;font-size:18px;transition:transform .15s ease,background .2s}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#2a1d07;box-shadow:0 8px 24px rgba(217,178,95,.25)}
+.btn-ghost{background:transparent;color:var(--muted);border:2px solid var(--line)}
+.btn-ghost:hover{color:var(--text);border-color:var(--gold)}
+
+/* ---------- intro overlay ---------- */
+#intro{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at 50% 35%,#2a241c 0%,var(--bg) 65%);display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto}
+#intro.gone{display:none}
+.step{max-width:560px;width:100%;text-align:center;display:none;flex-direction:column;align-items:center;gap:18px}
+.step.on{display:flex;animation:rise .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:.0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.logo-big{width:170px;height:170px;border-radius:50%;box-shadow:0 0 0 2px rgba(217,178,95,.35),0 0 60px rgba(217,178,95,.28)}
+.step.on .logo-big{animation:glow 2.4s ease-in-out infinite alternate}
+@keyframes glow{to{box-shadow:0 0 0 2px rgba(217,178,95,.6),0 0 90px rgba(217,178,95,.45)}}
+.welcome-small{font-size:20px;color:var(--muted);font-weight:700}
+.welcome-big{font-family:var(--display);font-weight:400;font-size:clamp(40px,9vw,64px);line-height:1.2}
+.welcome-sub{font-size:20px;font-weight:700;color:var(--text)}
+.dots{display:flex;gap:8px;justify-content:center}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--gold);width:24px;border-radius:8px}
+.about-card{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:28px 26px;display:flex;flex-direction:column;gap:14px;text-align:right;width:100%}
+.about-card h2{font-family:var(--display);font-weight:400;font-size:34px}
+.about-card p{margin:0;font-size:19px}
+.areas{display:flex;gap:10px;flex-wrap:wrap}
+.areas span{border:1px solid var(--gold);color:var(--gold-2);border-radius:999px;padding:2px 16px 4px;font-weight:700}
+.how{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:s}
+.how li{display:flex;gap:14px;align-items:center;font-size:18px;font-weight:600}
+.how li::before{counter-increment:s;content:counter(s,arabic-indic);flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#2a1d07;font-weight:900;font-size:20px}
+.step-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:10;background:rgba(20,18,16,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:12px;padding:10px 18px;max-width:1080px;margin:0 auto}
+.bar img{width:46px;height:46px;border-radius:50%}
+.brand{display:flex;flex-direction:column;line-height:1.2}
+.brand b{font-family:var(--display);font-weight:400;font-size:24px}
+.brand small{color:var(--muted);font-size:13px}
+.bar .spacer{flex:1}
+.bar .call{font-weight:900;font-size:15px;padding:8px 18px 10px}
+
+/* ---------- home ---------- */
+.hero{position:relative;overflow:hidden}
+.hero img{width:100%;height:clamp(200px,40vw,420px);object-fit:cover;object-position:30% 50%;filter:brightness(.85)}
+.hero .cap{padding:20px 18px 4px}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,6vw,52px);line-height:1.25}
+.hero p{margin:4px 0 0;color:var(--muted);font-weight:600;font-size:18px}
+section{padding:34px 0}
+.sec-title{font-family:var(--display);font-weight:400;font-size:32px;margin-bottom:6px}
+.sec-sub{color:var(--muted);margin:0 0 20px;font-size:17px}
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cat{position:relative;text-align:right;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:22px 22px 20px;color:var(--text);display:flex;flex-direction:column;gap:6px;transition:border-color .2s,transform .2s}
+.cat:hover{border-color:var(--gold);transform:translateY(-3px)}
+.cat .ico{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:rgba(217,178,95,.12);color:var(--gold)}
+.cat h3{font-family:var(--display);font-weight:400;font-size:32px;margin-top:6px}
+.cat p{margin:0;color:var(--muted);font-size:16px}
+.cat .count{position:absolute;left:18px;top:18px;font-weight:900;font-size:14px;border-radius:999px;padding:2px 12px 4px;background:var(--gold);color:#2a1d07}
+.cat .count.zero{background:var(--line);color:var(--muted)}
+.cat .go{margin-top:8px;color:var(--gold-2);font-weight:900}
+.contact{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:22px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}
+.contact h3{font-family:var(--display);font-weight:400;font-size:28px}
+.contact p{margin:0;color:var(--muted)}
+.phones{display:flex;flex-direction:column;gap:10px}
+.phone{display:flex;gap:10px;align-items:center}
+.phone .num{direction:ltr;font-weight:900;font-size:22px;letter-spacing:1px;font-variant-numeric:tabular-nums;color:var(--text)}
+.phone a{font-weight:900;font-size:14px;border-radius:999px;padding:5px 14px 7px;text-decoration:none}
+.phone a.wa{background:#1f8f4e;color:#fff}
+.phone a.tel{border:1px solid var(--gold);color:var(--gold-2)}
+
+/* ---------- listing view ---------- */
+.list-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.back{background:transparent;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 16px 8px;font-weight:700}
+.back:hover{border-color:var(--gold)}
+.list-head h2{font-family:var(--display);font-weight:400;font-size:38px}
+.ranges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:8px 18px 10px;font-weight:700;font-size:16px}
+.chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#2a1d07;font-weight:900}
+.chip .n{opacity:.7;font-weight:700;margin-inline-start:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;text-align:right;color:var(--text);padding:0;transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--gold);transform:translateY(-3px)}
+.thumb{position:relative;aspect-ratio:4/5;overflow:hidden;background:#000}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.play{position:absolute;inset:0;display:grid;place-items:center}
+.play span{width:66px;height:66px;border-radius:50%;background:rgba(20,18,16,.6);border:2px solid var(--gold-2);display:grid;place-items:center}
+.tag{position:absolute;top:12px;right:12px;background:var(--gold);color:#2a1d07;font-weight:900;font-size:14px;border-radius:999px;padding:2px 12px 4px}
+.card .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px}
+.card .price{font-family:var(--display);font-weight:400;font-size:28px;color:var(--gold-2);line-height:1.2}
+.card .title{font-weight:900;font-size:18px}
+.card .loc{color:var(--muted);font-size:15px}
+.feats{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.feats span{font-size:13px;font-weight:700;border-radius:999px;padding:1px 10px 3px;background:rgba(217,178,95,.1);color:var(--gold-2)}
+.empty{background:var(--panel);border:1px dashed var(--line);border-radius:20px;padding:30px 22px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty h3{font-family:var(--display);font-weight:400;font-size:28px}
+.empty p{margin:0;color:var(--muted)}
+
+/* ---------- unit modal ---------- */
+#unit{position:fixed;inset:0;z-index:40;background:rgba(10,9,8,.94);display:none;overflow:auto;padding:18px}
+#unit.on{display:block}
+.unit-box{max-width:980px;margin:0 auto;display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:26px;align-items:start}
+.unit-box video{width:100%;aspect-ratio:9/16;border-radius:18px;background:#000;border:1px solid var(--line)}
+.unit-info{display:flex;flex-direction:column;gap:12px}
+.unit-info .price{font-family:var(--display);font-weight:400;font-size:44px;color:var(--gold-2);line-height:1.2}
+.unit-info h2{font-family:var(--display);font-weight:400;font-size:34px}
+.unit-info .loc{color:var(--muted);font-size:18px;font-weight:600}
+.unit-info ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.unit-info li{display:flex;gap:10px;align-items:center;font-size:18px;font-weight:600}
+.unit-info li::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--gold);transform:rotate(45deg);flex:none}
+.close{position:sticky;top:0;margin-inline-start:auto;display:flex;max-width:980px;justify-content:flex-start;margin:0 auto 12px}
+
+.code{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:14px;border:1px solid var(--gold);color:var(--gold-2);border-radius:999px;padding:1px 12px 3px;width:max-content}
+.thumb .code{position:absolute;top:12px;left:12px;background:rgba(20,18,16,.8)}
+.finder{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.finder label{font-weight:900;font-size:18px}
+.finder input{flex:1;min-width:140px;background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:10px 18px;font-family:inherit;font-size:18px;font-weight:700}
+.finder input:focus{border-color:var(--gold);outline:none}
+.finder .msg{width:100%;color:var(--muted);font-size:15px;min-height:1em}
+footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center;color:var(--muted);font-size:14px}
+
+@media (max-width:760px){
+  .cats{grid-template-columns:1fr}
+  .contact{grid-template-columns:1fr}
+  .unit-box{grid-template-columns:1fr}
+  .unit-box video{max-height:78vh;width:auto;margin:0 auto}
+  .bar .call{display:none}
+  .unit-info .price{font-size:34px}
+  .unit-info h2{font-size:28px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ intro ============ -->
+<div id="intro" role="dialog" aria-label="مرحبًا">
+  <div class="step on" id="s-welcome">
+    <img class="logo-big" src="logo.png" alt="لوجو شركة القناوي">
+    <div class="welcome-small">مرحبًا بيك في</div>
+    <h1 class="welcome-big gold-text">شركة القناوي</h1>
+    <div class="welcome-sub">للتسويق والاستثمار العقاري</div>
+    <div class="step-actions"><button class="btn btn-gold" id="b-welcome">ادخل</button></div>
+  </div>
+
+  <div class="step" id="s-about">
+    <div class="about-card">
+      <h2 class="gold-text">مين احنا</h2>
+      <p>شركة القناوي للتسويق العقاري. بنشتغل في دار السلام والبساتين، وبنضمنلك شقة تناسبك.</p>
+      <div class="areas"><span>دار السلام</span><span>البساتين</span></div>
+    </div>
+    <div class="dots"><i class="on"></i><i></i></div>
+    <div class="step-actions">
+      <button class="btn btn-gold" id="b-about">كمّل</button>
+      <button class="btn btn-ghost skip">تخطّي</button>
+    </div>
+  </div>
+
+  <div class="step" id="s-how">
+    <div class="about-card">
+      <h2 class="gold-text">تلاقي شقتك إزاي</h2>
+      <ol class="how">
+        <li>اختار نوع الشقة: تمليك أو إيجار قديم أو إيجار جديد</li>
+        <li>اختار السعر اللي يناسبك</li>
+        <li>اتفرج على فيديو الشقة وكلمنا نحجزلك معاينة</li>
+      </ol>
+    </div>
+    <div class="dots"><i></i><i class="on"></i></div>
+    <div class="step-actions">
+      <button class="btn btn-gold" id="b-how">يلا نشوف الشقق</button>
+      <button class="btn btn-ghost skip">تخطّي</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ header ============ -->
+<header>
+  <div class="bar">
+    <img src="logo.png" alt="">
+    <div class="brand"><b class="gold-text">شركة القناوي</b><small>للتسويق والاستثمار العقاري</small></div>
+    <div class="spacer"></div>
+    <a class="btn btn-gold call" href="#contact" style="text-decoration:none">كلمنا</a>
+  </div>
+</header>
+
+<main>
+  <!-- home -->
+  <div id="v-home">
+    <div class="hero">
+      <img src="office.jpg" alt="مكتب شركة القناوي">
+      <div class="cap wrap">
+        <h1 class="gold-text">شقتك في دار السلام والبساتين</h1>
+        <p>اختار النوع والسعر، واتفرج على فيديو كل شقة قبل المعاينة</p>
+      </div>
+    </div>
+    <section class="wrap" style="padding-bottom:0">
+      <form class="finder" id="finder">
+        <label for="code-in">عندك كود شقة؟</label>
+        <input id="code-in" inputmode="numeric" autocomplete="off" placeholder="اكتب الكود هنا">
+        <button class="btn btn-gold" type="submit">اعرض الشقة</button>
+        <div class="msg" id="code-msg"></div>
+      </form>
+    </section>
+    <section class="wrap">
+      <h2 class="sec-title">انت بتدور على إيه؟</h2>
+      <p class="sec-sub">اختار نوع الشقة عشان نوريك المتاح دلوقتي</p>
+      <div class="cats" id="cats"></div>
+    </section>
+    <section class="wrap" id="contact">
+      <div class="contact">
+        <div>
+          <h3 class="gold-text">عايز تسأل على شقة؟</h3>
+          <p>كلمنا أو ابعتلنا واتساب واحجز معاينتك</p>
+        </div>
+        <div class="phones" id="phones"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- listing -->
+  <div id="v-list" hidden>
+    <section class="wrap">
+      <div class="list-head">
+        <button class="back" id="back">رجوع</button>
+        <h2 class="gold-text" id="list-title"></h2>
+      </div>
+      <div class="ranges" id="ranges"></div>
+      <div class="grid" id="grid"></div>
+    </section>
+  </div>
+</main>
+
+<!-- unit modal -->
+<div id="unit" role="dialog" aria-modal="true" aria-label="تفاصيل الشقة">
+  <div class="close"><button class="back" id="unit-close">رجوع للشقق</button></div>
+  <div class="unit-box">
+    <video id="unit-video" controls playsinline preload="metadata"></video>
+    <div class="unit-info">
+      <div class="code" id="u-code"></div>
+      <div class="price" id="u-price"></div>
+      <h2 id="u-title"></h2>
+      <div class="loc" id="u-loc"></div>
+      <ul id="u-feats"></ul>
+      <div class="phones" id="u-phones"></div>
+    </div>
+  </div>
+</div>
+
+<footer>شركة القناوي للتسويق والاستثمار العقاري · دار السلام والبساتين</footer>
+
+<!-- ============ DATA: edit here to add or remove flats ============ -->
+<script type="application/json" id="data">
+{
+  "phones": ["01114986555", "01070300302"],
+  "categories": {
+    "tamleek":  {"name": "تمليك", "desc": "شقق تمليك بعقود وورق سليم",
+                 "ranges": [[425000, 650000], [700000, 900000], [1000000, 1500000]]},
+    "old-rent": {"name": "إيجار قديم", "desc": "شقق إيجار قديم", "ranges": []},
+    "new-rent": {"name": "إيجار جديد", "desc": "شقق إيجار جديد", "ranges": []}
+  },
+  "units": [
+    {"id": "u1", "code": 101, "cat": "tamleek", "price": 1200000, "title": "شقة ١٥٠ متر",
+     "loc": "سور الشركة العمومي",
+     "feats": ["تلت أوض وريسبشن", "مطبخ وحمام", "بلكونتين", "الواجهة مش مجروحة", "عمارة جديدة بأسانسير", "الورق سليم"],
+     "video": "apt1.mp4", "poster": "apt1.jpg"},
+    {"id": "u2", "code": 102, "cat": "tamleek", "price": 775000, "title": "شقة أوضتين وريسبشن",
+     "loc": "أبو أشرف · شارع حلواني السلام",
+     "feats": ["أوضتين وريسبشن", "مطبخ وحمام", "بحري وتهويتها ممتازة", "عمارة جديدة ونضيفة جدًا", "على شارع عمومي"],
+     "video": "apt2.mp4", "poster": "apt2.jpg"}
+  ]
+}
+</script>
+
+<script>
+(function(){
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const $ = s => document.querySelector(s);
+  const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+
+  // 775000 -> "٧٧٥ ألف" ; 1200000 -> "مليون و٢٠٠ ألف"
+  function money(v){
+    const m = Math.floor(v / 1e6), k = Math.round((v % 1e6) / 1000);
+    let s = '';
+    if (m === 1) s = 'مليون'; else if (m === 2) s = 'مليونين'; else if (m > 2) s = AR(m) + ' مليون';
+    if (k) s += (s ? ' و' : '') + AR(k) + ' ألف';
+    return s || AR(v);
+  }
+  const rangeLabel = r => 'من ' + money(r[0]) + ' لـ ' + money(r[1]);
+  const inRange = (u, r) => !r || (u.price >= r[0] && u.price <= r[1]);
+  const icons = {
+    'tamleek':'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+    'old-rent':'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg>',
+    'new-rent':'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6M12 8v3M10.5 9.5h3"/></svg>'
+  };
+
+  // phones
+  function phonesHTML(u){
+    const txt = u ? '?text=' + encodeURIComponent('السلام عليكم، عايز أستفسر عن الشقة كود ' + AR(u.code)) : '';
+    return D.phones.map(p => {
+      const intl = '2' + p;
+      return '<div class="phone"><span class="num">' + p + '</span>' +
+        '<a class="wa" href="https://wa.me/' + intl + txt + '">واتساب</a>' +
+        '<a class="tel" href="tel:' + p + '">اتصال</a></div>';
+    }).join('');
+  }
+  $('#phones').innerHTML = phonesHTML();
+
+  // home categories
+  $('#cats').innerHTML = Object.entries(D.categories).map(([key, c]) => {
+    const n = D.units.filter(u => u.cat === key).length;
+    return '<button class="cat" data-cat="' + key + '">' +
+      '<span class="count' + (n ? '' : ' zero') + '">' + (n ? AR(n) + ' متاح' : 'قريبًا') + '</span>' +
+      '<span class="ico">' + icons[key] + '</span>' +
+      '<h3>' + c.name + '</h3><p>' + c.desc + '</p><span class="go">اعرض الشقق ←</span></button>';
+  }).join('');
+  document.querySelectorAll('.cat').forEach(b => b.addEventListener('click', () => go(b.dataset.cat)));
+
+  // listing
+  let cur = null, curRange = -1;
+  function showList(key){
+    const c = D.categories[key]; if (!c) return showHome();
+    cur = key; curRange = -1;
+    $('#v-home').hidden = true; $('#v-list').hidden = false;
+    $('#list-title').textContent = 'شقق ' + c.name;
+    renderRanges(); renderGrid();
+    window.scrollTo(0, 0);
+  }
+  function renderRanges(){
+    const c = D.categories[cur], all = D.units.filter(u => u.cat === cur);
+    if (!c.ranges.length){ $('#ranges').innerHTML = ''; return; }
+    const chips = [['كل الأسعار', -1, all.length]].concat(
+      c.ranges.map((r, i) => [rangeLabel(r), i, all.filter(u => inRange(u, r)).length]));
+    $('#ranges').innerHTML = chips.map(([t, i, n]) =>
+      '<button class="chip" data-r="' + i + '" aria-pressed="' + (i === curRange) + '">' + t + '<span class="n">(' + AR(n) + ')</span></button>').join('');
+    document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+      curRange = +b.dataset.r; renderRanges(); renderGrid();
+    }));
+  }
+  function renderGrid(){
+    const c = D.categories[cur];
+    const r = curRange >= 0 ? c.ranges[curRange] : null;
+    const list = D.units.filter(u => u.cat === cur && inRange(u, r)).sort((a, b) => a.price - b.price);
+    if (!list.length){
+      $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1"><h3 class="gold-text">مفيش شقق متاحة هنا دلوقتي</h3>' +
+        '<p>كلمنا وقولنا انت عايز إيه، وأول ما تنزل شقة تناسبك هنبلغك</p><div class="phones">' + phonesHTML() + '</div></div>';
+      return;
+    }
+    $('#grid').innerHTML = list.map(u =>
+      '<button class="card" data-id="' + u.id + '"><div class="thumb"><img src="' + u.poster + '" alt="' + u.title + '" loading="lazy">' +
+      '<span class="tag">' + c.name + '</span><span class="code">كود ' + AR(u.code) + '</span><div class="play"><span><svg width="26" height="26" viewBox="0 0 24 24" fill="#f3d998"><path d="M8 5v14l11-7z"/></svg></span></div></div>' +
+      '<div class="body"><div class="price">' + money(u.price) + '</div><div class="title">' + u.title + '</div>' +
+      '<div class="loc">' + u.loc + '</div><div class="feats">' + u.feats.slice(0, 3).map(f => '<span>' + f + '</span>').join('') + '</div></div></button>'
+    ).join('');
+    document.querySelectorAll('.card').forEach(b => b.addEventListener('click', () => openUnit(b.dataset.id)));
+  }
+
+  // unit
+  const vid = $('#unit-video');
+  function openUnit(id){
+    const u = D.units.find(x => x.id === id); if (!u) return;
+    vid.poster = u.poster; vid.src = u.video;
+    $('#u-price').textContent = 'سعر الشقة: ' + money(u.price);
+    $('#u-title').textContent = u.title;
+    $('#u-loc').textContent = u.loc;
+    $('#u-feats').innerHTML = u.feats.map(f => '<li>' + f + '</li>').join('');
+    $('#u-phones').innerHTML = phonesHTML(u);
+    $('#u-code').textContent = 'كود الشقة ' + AR(u.code);
+    $('#unit').classList.add('on'); $('#unit').scrollTop = 0;
+  }
+  function closeUnit(){ vid.pause(); vid.removeAttribute('src'); vid.load(); $('#unit').classList.remove('on'); }
+  $('#unit-close').addEventListener('click', closeUnit);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUnit(); });
+
+  // find by code (accepts Arabic or English digits)
+  $('#finder').addEventListener('submit', e => {
+    e.preventDefault();
+    const raw = $('#code-in').value.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g, '');
+    const u = D.units.find(x => String(x.code) === raw);
+    $('#code-msg').textContent = raw ? (u ? '' : 'مفيش شقة بالكود ده دلوقتي. اتأكد منه أو كلمنا') : 'اكتب الكود الأول';
+    if (u) openUnit(u.id);
+  });
+
+  // navigation via #hash (tamleek / old-rent / new-rent)
+  function showHome(){ cur = null; $('#v-home').hidden = false; $('#v-list').hidden = true; }
+  function go(key){ if (location.hash !== '#' + key) location.hash = key; else route(); }
+  function route(){
+    const h = location.hash.slice(1);
+    if (D.categories[h]){ closeIntro(); showList(h); }
+    else if (h !== 'contact') showHome();
+  }
+  $('#back').addEventListener('click', () => { history.length > 1 && location.hash ? history.back() : (location.hash = ''); showHome(); });
+  window.addEventListener('hashchange', route);
+
+  // intro: welcome → about → how → site
+  const steps = ['s-welcome', 's-about', 's-how'];
+  let at = 0, auto;
+  function show(i){ steps.forEach((s, j) => $('#' + s).classList.toggle('on', i === j)); at = i; }
+  function closeIntro(){ clearTimeout(auto); $('#intro').classList.add('gone'); }
+  $('#b-welcome').addEventListener('click', () => { clearTimeout(auto); show(1); });
+  $('#b-about').addEventListener('click', () => show(2));
+  $('#b-how').addEventListener('click', closeIntro);
+  document.querySelectorAll('.skip').forEach(b => b.addEventListener('click', closeIntro));
+
+  if (D.categories[location.hash.slice(1)]) route();
+  else auto = setTimeout(() => { if (at === 0) show(1); }, 3200);
+})();
+</script>
+</body>
+</html>
