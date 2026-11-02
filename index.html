@@ -198,9 +198,13 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
   #unit{padding:12px}
   .unit-box{gap:16px}
   .unit-box video{max-height:none;width:min(100%,calc(68vh*9/16));margin:0 auto}
-  #u-media{margin-inline:-12px}
-  .unit-box iframe{width:100vw;max-width:none;max-height:none;aspect-ratio:auto;height:min(82vh,calc(100vw*16/9));margin:0;border-radius:0;border-inline:0}
-  .unit-box video{border-radius:0}
+  #unit{padding:0 0 24px;background:var(--bg)}
+  #unit .close{position:static;margin:0;padding:10px 12px;justify-content:flex-start}
+  .unit-box{gap:14px}
+  .unit-info{padding:0 16px}
+  #u-media{width:100%;overflow:hidden}
+  .unit-box iframe{display:block;width:100%;max-width:100%;max-height:none;aspect-ratio:auto;height:min(78vh,calc(100vw*16/9));margin:0;border-radius:0;border:0}
+  .unit-box video{border-radius:0;border:0}
   .unit-info .price{font-size:30px}
   .unit-info h2{font-size:24px}
   .unit-info li{font-size:16px}
