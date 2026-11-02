@@ -371,7 +371,9 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
     return s || AR(v);
   }
   const rangeLabel = r => 'من ' + money(r[0]) + ' لـ ' + money(r[1]);
-  const inRange = (u, r) => !r || (u.price >= r[0] && u.price <= r[1]);
+  // the top range of each category also takes everything above it
+  Object.values(D.categories).forEach(c => { if (c.ranges.length) c.ranges[c.ranges.length - 1].open = true; });
+  const inRange = (u, r) => !r || (u.price >= r[0] && (r.open || u.price <= r[1]));
   const icons = {
     'tamleek':'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
     'old-rent':'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg>',
