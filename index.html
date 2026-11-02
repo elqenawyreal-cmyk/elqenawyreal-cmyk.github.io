@@ -142,7 +142,8 @@ section.wrap{padding-top:44px;padding-bottom:44px}
 .unit-info ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
 .unit-info li{display:flex;gap:10px;align-items:center;font-size:18px;font-weight:600}
 .unit-info li::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--gold);transform:rotate(45deg);flex:none}
-.close{position:sticky;top:0;margin-inline-start:auto;display:flex;max-width:980px;justify-content:flex-start;margin:0 auto 12px}
+.close{position:sticky;top:-18px;z-index:6;display:flex;max-width:980px;justify-content:flex-start;margin:-18px auto 12px;padding:18px 0 10px;background:var(--bg);box-shadow:0 8px 16px -8px rgba(0,0,0,.6)}
+#unit{background:var(--bg)}
 
 .code{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:14px;border:1px solid var(--gold);color:var(--gold-2);border-radius:999px;padding:1px 12px 3px;width:max-content}
 .thumb .code{position:absolute;top:12px;left:12px;background:rgba(20,18,16,.8)}
@@ -153,8 +154,24 @@ section.wrap{padding-top:44px;padding-bottom:44px}
 .finder .msg{width:100%;color:var(--muted);font-size:15px}
 .finder .msg:empty{display:none}
 
-.vscale{position:relative;direction:ltr;width:100%;height:min(78vh,calc(100vw*16/9));overflow:hidden;background:#000}
-.unit-box .vscale iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;max-width:none;max-height:none;aspect-ratio:auto;border-radius:0}
+.yp{position:relative;direction:ltr;width:100%;aspect-ratio:9/16;max-height:78vh;background:#000;border-radius:18px;overflow:hidden;border:1px solid var(--line);margin:0 auto}
+.yp:fullscreen{max-height:none;border-radius:0;border:0}
+.yp-frame,.yp-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.yp-frame{transform:scale(1.02)}
+.yp-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .3s}
+.yp.started .yp-poster{opacity:0;pointer-events:none}
+.yp-tap{position:absolute;inset:0;background:transparent;border:0;z-index:2;cursor:pointer}
+.yp-big{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;width:74px;height:74px;border-radius:50%;display:grid;place-items:center;pointer-events:none;
+  background:rgba(20,18,16,.55);border:2px solid var(--gold-2);color:var(--gold-2);transition:opacity .2s}
+.yp-big svg{width:34px;height:34px;margin-left:4px}
+.yp.playing .yp-big{opacity:0}
+.yp-bar{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;align-items:center;gap:8px;padding:22px 10px 10px;
+  background:linear-gradient(0deg,rgba(0,0,0,.75),transparent);opacity:0;transition:opacity .25s;pointer-events:none}
+.yp.show .yp-bar,.yp:not(.started) .yp-bar{opacity:1;pointer-events:auto}
+.yp-bar button{flex:none;width:34px;height:34px;padding:6px;border:0;border-radius:50%;background:transparent;color:#fff;display:grid;place-items:center}
+.yp-bar button svg{width:22px;height:22px}
+.yp-time{flex:none;color:#fff;font-size:12px;font-variant-numeric:tabular-nums;font-family:system-ui,sans-serif}
+.yp-seek{flex:1;min-width:0;accent-color:var(--gold);height:4px}
 footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center;color:var(--muted);font-size:14px}
 
 @media (max-width:760px){
@@ -202,7 +219,8 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
   .unit-box{gap:16px}
   .unit-box video{max-height:none;width:min(100%,calc(68vh*9/16));margin:0 auto}
   #unit{padding:0 0 24px;background:var(--bg)}
-  #unit .close{position:static;margin:0;padding:10px 12px;justify-content:flex-start}
+  #unit .close{position:sticky;top:0;margin:0;padding:10px 12px;justify-content:flex-start}
+  .yp{border-radius:0;border:0;max-height:78vh;width:100%}
   .unit-box{gap:14px}
   .unit-info{padding:0 16px}
   #u-media{width:100%;overflow:hidden}
@@ -456,24 +474,91 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
     document.querySelectorAll('.card').forEach(b => b.addEventListener('click', () => openUnit(b.dataset.id)));
   }
 
+  // ---------- our own player around YouTube (YouTube's buttons hidden) ----------
+  let ytReady = null;
+  function loadYT(){
+    if (ytReady) return ytReady;
+    ytReady = new Promise(res => {
+      if (window.YT && YT.Player) return res();
+      window.onYouTubeIframeAPIReady = res;
+      const sc = document.createElement('script'); sc.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(sc);
+    });
+    return ytReady;
+  }
+  const IC = {
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>',
+    vol: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>',
+    mute: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 4V5L8 9H4zm15.6 3 2.2-2.2-1.4-1.4-2.2 2.2-2.2-2.2-1.4 1.4 2.2 2.2-2.2 2.2 1.4 1.4 2.2-2.2 2.2 2.2 1.4-1.4z"/></svg>',
+    full: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>'
+  };
+  const mmss = t => { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+  function ytPlayer(u){
+    const w = document.createElement('div'); w.className = 'yp';
+    w.innerHTML = '<div class="yp-frame"><div></div></div>' +
+      (u.poster ? '<img class="yp-poster" src="' + u.poster + '" alt="">' : '') +
+      '<button class="yp-tap" type="button" aria-label="تشغيل"></button>' +
+      '<span class="yp-big">' + IC.play + '</span>' +
+      '<div class="yp-bar"><button class="yp-pp" type="button" aria-label="تشغيل">' + IC.play + '</button>' +
+      '<span class="yp-time">0:00</span><input class="yp-seek" type="range" min="0" max="1000" value="0" aria-label="مكان الفيديو">' +
+      '<button class="yp-mute" type="button" aria-label="الصوت">' + IC.vol + '</button>' +
+      '<button class="yp-fs" type="button" aria-label="ملء الشاشة">' + IC.full + '</button></div>';
+    const q = s => w.querySelector(s);
+    let P = null, timer = null, hideT = null;
+    const showBar = () => { w.classList.add('show'); clearTimeout(hideT); hideT = setTimeout(() => { if (w.classList.contains('playing')) w.classList.remove('show'); }, 2500); };
+    const sync = () => {
+      if (!P || !P.getDuration) return;
+      const d = P.getDuration() || 0, c = P.getCurrentTime() || 0;
+      if (!w.dragging) q('.yp-seek').value = d ? Math.round(c / d * 1000) : 0;
+      q('.yp-time').textContent = mmss(c) + ' / ' + mmss(d);
+    };
+    const setState = playing => {
+      w.classList.toggle('playing', playing);
+      q('.yp-pp').innerHTML = playing ? IC.pause : IC.play;
+      if (playing){ w.classList.add('started'); clearInterval(timer); timer = setInterval(sync, 300); showBar(); }
+      else { clearInterval(timer); w.classList.add('show'); sync(); }
+    };
+    const start = () => loadYT().then(() => {
+      if (P) return;
+      P = new YT.Player(q('.yp-frame div'), {
+        videoId: u.yt,
+        playerVars: {controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3, modestbranding: 1, playsinline: 1, rel: 0, autoplay: 1},
+        events: {
+          onReady: e => { e.target.playVideo(); sync(); },
+          onStateChange: e => { if (e.data === 1) setState(true); else if (e.data === 2 || e.data === 0) setState(false); }
+        }
+      });
+    });
+    const toggle = () => {
+      if (!P){ w.classList.add('started'); start(); return; }
+      if (w.classList.contains('playing')) P.pauseVideo(); else P.playVideo();
+    };
+    q('.yp-tap').addEventListener('click', () => { if (w.classList.contains('playing') && !w.classList.contains('show')) { showBar(); return; } toggle(); });
+    q('.yp-pp').addEventListener('click', e => { e.stopPropagation(); toggle(); });
+    q('.yp-mute').addEventListener('click', e => {
+      e.stopPropagation(); if (!P) return;
+      if (P.isMuted()){ P.unMute(); q('.yp-mute').innerHTML = IC.vol; } else { P.mute(); q('.yp-mute').innerHTML = IC.mute; }
+      showBar();
+    });
+    const seek = q('.yp-seek');
+    seek.addEventListener('input', () => { w.dragging = true; showBar(); });
+    seek.addEventListener('change', () => { w.dragging = false; if (P) P.seekTo(seek.value / 1000 * (P.getDuration() || 0), true); });
+    q('.yp-fs').addEventListener('click', e => {
+      e.stopPropagation();
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      else if (w.requestFullscreen) w.requestFullscreen().catch(() => {});
+      else if (w.webkitRequestFullscreen) w.webkitRequestFullscreen();
+    });
+    w.stop = () => { clearInterval(timer); try { P && P.destroy(); } catch(e){} };
+    return w;
+  }
+
   // unit
   function openUnit(id){
     const u = D.units.find(x => x.id === id); if (!u) return;
     const m = $('#u-media'); m.innerHTML = '';
-    const phone = matchMedia('(max-width:760px)').matches;
-    if (u.embed && phone){
-      // phones: draw Drive's player at a bigger size and shrink it,
-      // so its buttons take much less of the screen
-      const S = 0.6;
-      const box = document.createElement('div'); box.className = 'vscale';
-      const f = document.createElement('iframe');
-      f.src = u.embed; f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;
-      f.title = u.title; box.appendChild(f); m.appendChild(box);
-      const fit = () => {
-        const W = box.clientWidth, H = box.clientHeight;
-        f.style.width = (W / S) + 'px'; f.style.height = (H / S) + 'px'; f.style.transform = 'scale(' + S + ')';
-      };
-      requestAnimationFrame(fit); addEventListener('resize', fit);
+    if (u.yt){
+      m.appendChild(ytPlayer(u));
     } else if (u.embed){
       const f = document.createElement('iframe');
       f.src = u.embed; f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;
@@ -491,7 +576,7 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
     $('#u-code').textContent = 'كود الشقة ' + AR(u.code);
     $('#unit').classList.add('on'); $('#unit').scrollTop = 0;
   }
-  function closeUnit(){ $('#u-media').innerHTML = ''; $('#unit').classList.remove('on'); }
+  function closeUnit(){ const yp = document.querySelector('#u-media .yp'); if (yp && yp.stop) yp.stop(); $('#u-media').innerHTML = ''; $('#unit').classList.remove('on'); }
   $('#unit-close').addEventListener('click', closeUnit);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUnit(); });
 
@@ -557,6 +642,7 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
     v = (v || '').trim(); img = (img || '').trim();
     let m, out = {video: '', embed: '', poster: img};
     if ((m = v.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/))){
+      out.yt = m[1];
       out.embed = 'https://www.youtube.com/embed/' + m[1] + '?rel=0&playsinline=1';
       if (!img) out.poster = 'https://i.ytimg.com/vi/' + m[1] + '/hqdefault.jpg';
     } else if ((m = v.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/))){
@@ -571,7 +657,8 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
     const head = rows.shift().map(h => h.trim());
     const col = name => head.indexOf(name);
     const C = {code: col('الكود'), type: col('النوع'), price: col('السعر'), title: col('العنوان'), loc: col('المكان'),
-               feats: col('المميزات'), video: col('الفيديو'), img: col('الصورة'), ok: col('متاحة')};
+               feats: col('المميزات'), video: col('الفيديو'), img: col('الصورة'), ok: col('متاحة'),
+               yt: head.findIndex(h => h.includes('يوتيوب'))};
     const g = (r, k) => C[k] >= 0 ? (r[C[k]] || '').trim() : '';
     const units = [];
     rows.forEach((r, i) => {
@@ -584,7 +671,7 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
         title: g(r, 'title') || 'شقة ' + D.categories[cat].name,
         loc: g(r, 'loc'),
         feats: g(r, 'feats').split(/[،,\-|\n]+/).map(x => x.trim()).filter(Boolean)
-      }, media(g(r, 'video'), g(r, 'img'))));
+      }, media(g(r, 'yt') || g(r, 'video'), g(r, 'img'))));
     });
     return units;
   }
