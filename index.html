@@ -438,7 +438,7 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
     $('#grid').innerHTML = list.map(u =>
       '<button class="card" data-id="' + u.id + '"><div class="thumb">' + (u.poster ? '<img src="' + u.poster + '" alt="" loading="lazy">' : '<div class="noimg"><img src="logo.png" alt=""></div>') +
       '<span class="tag">' + c.name + '</span><span class="code">كود ' + AR(u.code) + '</span><div class="play"><span><svg width="26" height="26" viewBox="0 0 24 24" fill="#f3d998"><path d="M8 5v14l11-7z"/></svg></span></div></div>' +
-      '<div class="body"><div class="price">' + money(u.price) + '</div><div class="title">' + u.title + '</div>' +
+      '<div class="body"><div class="price">' + money(u.price) + (u.cat === 'tamleek' ? '' : ' <small style="font-size:.55em;color:var(--muted)">شهريًا</small>') + '</div><div class="title">' + u.title + '</div>' +
       '<div class="loc">' + u.loc + '</div><div class="feats">' + u.feats.slice(0, 3).map(f => '<span>' + f + '</span>').join('') + '</div></div></button>'
     ).join('');
     document.querySelectorAll('.card').forEach(b => b.addEventListener('click', () => openUnit(b.dataset.id)));
@@ -457,7 +457,7 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
       v.controls = true; v.playsInline = true; v.preload = 'metadata';
       if (u.poster) v.poster = u.poster; v.src = u.video; m.appendChild(v);
     }
-    $('#u-price').textContent = 'سعر الشقة: ' + money(u.price);
+    $('#u-price').textContent = (u.cat === 'tamleek' ? 'سعر الشقة: ' : 'الإيجار: ') + money(u.price) + (u.cat === 'tamleek' ? '' : ' شهريًا');
     $('#u-title').textContent = u.title;
     $('#u-loc').textContent = u.loc;
     $('#u-feats').innerHTML = u.feats.map(f => '<li>' + f + '</li>').join('');
@@ -565,7 +565,7 @@ footer{border-top:1px solid var(--line);padding:22px 18px 40px;text-align:center
   // main tab + the Google Form responses tab; merged and de-duplicated
   const TABS = ['1156483525', '418683083'];   // tab ids: the main list, then the form responses
   Promise.all(TABS.map(gid =>
-    fetch('https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&headers=1&gid=' + gid + '&t=' + Date.now())
+    fetch('https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + gid + '&t=' + Date.now())
       .then(r => r.ok ? r.text() : '')
       .then(t => t ? rowsToUnits(parseCSV(t)) : [])
       .catch(() => [])
